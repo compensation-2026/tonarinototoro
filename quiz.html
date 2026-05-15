@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>補償業務管理士試験</title>
+    <style>
+        /* ========================================
+           基本スタイル
+        ======================================== */
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        /* ========================================
+           ナビゲーションボタン
+        ======================================== */
+        #navigation-buttons {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #5a6268;
+        }
+
+        .back-button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        #show-result-btn {
+            background-color: #17a2b8;
+        }
+
+        #show-result-btn:hover:not(:disabled) {
+            background-color: #138496;
+        }
+
+        .go-home-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .go-home-btn:hover {
+            background-color: #218838;
+        }
+
+        /* ========================================
+           デバッグ情報
+        ======================================== */
+        .debug-info {
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-family: monospace;
+        }
+
+        /* ========================================
+           プログレスバー
+        ======================================== */
+        #progress-container {
+            margin-bottom: 20px;
+        }
+
+        #progress-bar {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        #progress {
+            width: 0%;
+            height: 20px;
+            background-color: #4CAF50;
+            transition: width 0.3s ease-in-out;
+        }
+
+        #progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* ========================================
+           問題表示エリア
+        ======================================== */
+        #question {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        #statements {
+            margin: 12px 0 16px;
+        }
+
+        .statement {
+            padding: 8px 10px;
+            margin-bottom: 6px;
+            background: #f7f7f7;
+            border-left: 4px solid #999;
+            border-radius: 4px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+
+        /* ========================================
+           選択肢
+        ======================================== */
+        #options .option {
+            margin: 10px 0;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #options .option:hover:not(.disabled) {
+            background-color: #d4edda;
+        }
+
+        #options .option.disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        #options .correct {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+
+        #options .incorrect {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+
+        /* ========================================
+           次へボタン
+        ======================================== */
+        #next-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #next-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* ========================================
+           結果サマリー
+        ======================================== */
+        #result-summary {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            display: none;
+        }
+
+        #result-summary.active {
+            border: 1px solid #ccc;
+        }
+
+        #result-summary button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #result-summary button:hover {
+            background-color: #218838;
+        }
+
+        #result-summary button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* ========================================
+           途中結果モーダル
+        ======================================== */
+        #interim-result-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        #interim-result-modal.active {
+            display: block;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 30px;
+            border: 1px solid #888;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .modal-close {
+            color: #aaa;
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .modal-close:hover,
+        .modal-close:focus {
+            color: #000;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .modal-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .modal-button.continue {
+            background-color: #007BFF;
+        }
+
+        .modal-button.continue:hover {
+            background-color: #0056b3;
+        }
+
+        .modal-button.home {
+            background-color: #28a745;
+        }
+
+        .modal-button.home:hover {
+            background-color: #218838;
+        }
+
+        /* ========================================
+           エラー表示
+        ======================================== */
+        .error-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .error-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .error-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #856404;
+            margin-bottom: 15px;
+        }
+
+        .error-message {
+            font-size: 16px;
+            color: #856404;
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+
+        .error-details {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #666;
+            text-align: left;
+        }
+
+        .home-button {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #007BFF;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .home-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* ========================================
+           円グラフ（改善版）
+        ======================================== */
+        .chart-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .pie-chart {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: conic-gradient(
+                #4CAF50 0deg,
+                #4CAF50 var(--correct-deg),
+                #f44336 var(--correct-deg),
+                #f44336 360deg
+            );
+            position: relative;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .pie-chart::before {
+            content: '';
+            position: absolute;
+            width: 140px;
+            height: 140px;
+            background: white;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .pie-chart-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 1;
+        }
+
+        .pie-chart-percentage {
+            font-size: 36px;
+            font-weight: bold;
+            color: #333;
+            line-height: 1;
+        }
+
+        .pie-chart-label {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .chart-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+        }
+
+        .legend-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .legend-color.correct {
+            background-color: #4CAF50;
+        }
+
+        .legend-color.incorrect {
+            background-color: #f44336;
+        }
+
+        .legend-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .legend-label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .legend-count {
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* ========================================
+           合格/不合格表示（新規追加）
+        ======================================== */
+        .pass-fail-badge {
+            display: inline-block;
+            padding: 10px 25px;
+            margin: 15px 0;
+            border-radius: 25px;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .pass-fail-badge.pass {
+            background-color: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+
+        .pass-fail-badge.fail {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <!-- ========================================
+         ヘッダー
+    ======================================== -->
+    <h1 id="quiz-title">補償業務管理士試験</h1>
+
+    <!-- ========================================
+         ナビゲーションボタン
+    ======================================== -->
+    <div id="navigation-buttons">
+        <a href="index.html" class="back-button">ホームに戻る</a>
+        <button id="show-result-btn" class="back-button" style="display: none;">途中結果を見る</button>
+    </div>
+
+    <!-- ========================================
+         デバッグ情報
+    ======================================== -->
+    <div id="debug-info" style="font-size:12px; color:#555;"></div>
+
+    <!-- ========================================
+         プログレスバー
+    ======================================== -->
+    <div id="progress-container">
+        <div id="question-counter"></div>
+        <div id="accuracy-rate"></div>
+        <div style="height:8px; background:#eee; border-radius:4px; overflow:hidden;">
+            <div id="progress" style="height:8px; width:0%; background:#4caf50;"></div>
+        </div>
+    </div>
+
+    <!-- ========================================
+         問題表示エリア
+    ======================================== -->
+    <h2 id="question"></h2>
+    <div id="statements"></div>
+    <div id="options"></div>
+    <div id="result" style="margin-top:8px;"></div>
+    <div id="explanation" style="margin-top:8px; white-space:pre-wrap;"></div>
+    <button id="next-button" style="display:none;" onclick="goToNextQuestion()">次へ</button>
+
+    <!-- ========================================
+         結果サマリー
+    ======================================== -->
+    <div id="result-summary"></div>
+
+    <!-- ========================================
+         途中結果モーダル（新規追加）
+    ======================================== -->
+    <div id="interim-result-modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeInterimResult()">&times;</span>
+            <h2>途中結果</h2>
+            <div id="interim-chart"></div>
+            <div id="interim-stats"></div>
+            <div class="modal-buttons">
+                <button class="modal-button continue" onclick="closeInterimResult()">続きから再開</button>
+                <button class="modal-button home" onclick="window.location.href='index.html'">ホームに戻る</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    /* ========================================
+       グローバル変数
+    ======================================== */
+    let quizTitle = '補償業務管理士試験';
+    let shuffleChoices = true;
+    let shuffleQuestions = true;
+    let questions = [];
+    let currentShuffledOptions = [];
+    let currentQuestionIndex = 0;
+    let correctCount = 0;
+    let incorrectCount = 0;
+    let isAnswered = false;
+    let wrongQuestions = [];
+
+    /* ========================================
+       ユーティリティ関数
+    ======================================== */
+    
+    function shuffleArray(array) {
+        const arr = [...array];
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function reorderExplanation(explanation, shuffledOptions) {
+        if (!explanation) return "";
+        const lines = explanation.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+        const explanationMap = [];
+        const pattern = /^(\d+)[\.\．]\s*(.*)$/;
+
+        lines.forEach(line => {
+            const match = line.match(pattern);
+            if (match) {
+                const num = parseInt(match[1], 10);
+                if (!isNaN(num)) {
+                    explanationMap[num - 1] = match[2];
+                }
+            }
+        });
+
+        const reordered = shuffledOptions.map((option, index) => {
+            const text = explanationMap[option.originalIndex];
+            return text !== undefined ? `${index + 1}．${text}` : `${index + 1}．解説なし`;
+        });
+
+        return reordered.join("\n");
+    }
+
+    function showDebugInfo(message) {
+        const debugDiv = document.getElementById("debug-info");
+        if (debugDiv) {
+            debugDiv.innerHTML += "<br>" + message;
+        }
+        console.log('[DEBUG]', message);
+    }
+
+    function getQueryParams() {
+        const params = new URLSearchParams(window.location.search);
+        return {
+            file: params.get('file') || null,
+            files: params.get('files') || null,
+            title: params.get('title') || '補償業務管理士試験',
+            shuffleChoices: params.get('shuffleChoices') !== 'false',
+            shuffleQuestions: params.get('shuffleQuestions') !== 'false'
+        };
+    }
+
+    function createPieChart(correctCount, incorrectCount, accuracyRate) {
+        const total = correctCount + incorrectCount;
+        if (total === 0) return '<p style="text-align:center; color:#666;">まだ解答していません</p>';
+        
+        const correctDeg = (correctCount / total) * 360;
+        
+        return `
+            <div class="chart-container">
+                <div class="pie-chart" style="--correct-deg: ${correctDeg}deg;">
+                    <div class="pie-chart-text">
+                        <div class="pie-chart-percentage">${accuracyRate}%</div>
+                        <div class="pie-chart-label">正答率</div>
+                    </div>
+                </div>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <div class="legend-color correct"></div>
+                        <div class="legend-text">
+                            <span class="legend-label">正解</span>
+                            <span class="legend-count">${correctCount}問</span>
+                        </div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color incorrect"></div>
+                        <div class="legend-text">
+                            <span class="legend-label">不正解</span>
+                            <span class="legend-count">${incorrectCount}問</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    /* ========================================
+       途中結果表示機能（新規追加）
+    ======================================== */
+    
+    function showInterimResult() {
+        const totalAnswered = correctCount + incorrectCount;
+        
+        if (totalAnswered === 0) {
+            alert('まだ問題に解答していません。');
+            return;
+        }
+
+        const accuracyRate = ((correctCount / totalAnswered) * 100).toFixed(1);
+        const isPass = parseFloat(accuracyRate) >= 60;
+        const passFailText = isPass ? '合格ライン到達' : '合格ライン未到達';
+        const passFailClass = isPass ? 'pass' : 'fail';
+
+        const modal = document.getElementById('interim-result-modal');
+        const chartDiv = document.getElementById('interim-chart');
+        const statsDiv = document.getElementById('interim-stats');
+
+        chartDiv.innerHTML = createPieChart(correctCount, incorrectCount, accuracyRate);
+        
+        statsDiv.innerHTML = `
+            <div style="text-align: center; margin: 20px 0;">
+                <p style="font-size: 16px; margin: 10px 0;">
+                    <strong>進捗状況:</strong> ${currentQuestionIndex} / ${questions.length} 問完了
+                </p>
+                <p style="font-size: 16px; margin: 10px 0;">
+                    <strong>解答済み:</strong> ${totalAnswered} 問
+                </p>
+                <p style="font-size: 16px; margin: 10px 0;">
+                    <strong>正解数:</strong> ${correctCount} 問
+                </p>
+                <p style="font-size: 16px; margin: 10px 0;">
+                    <strong>不正解数:</strong> ${incorrectCount} 問
+                </p>
+                <p style="font-size: 16px; margin: 10px 0;">
+                    <strong>正答率:</strong> ${accuracyRate}%
+                </p>
+                <div class="pass-fail-badge ${passFailClass}">
+                    ${passFailText}
+                </div>
+                <p style="font-size: 14px; color: #666; margin-top: 15px;">
+                    ※合格ラインは60%です
+                </p>
+            </div>
+        `;
+
+        modal.classList.add('active');
+    }
+
+    function closeInterimResult() {
+        const modal = document.getElementById('interim-result-modal');
+        modal.classList.remove('active');
+    }
+
+    /* ========================================
+       エラー処理
+    ======================================== */
+    
+    function showError(filename, title, errorDetails = "") {
+        console.error('[ERROR] showError() 呼び出し:', { filename, title, errorDetails });
+        
+        const progressContainer = document.getElementById("progress-container");
+        if (progressContainer) {
+            progressContainer.style.display = "none";
+        }
+
+        const questionEl = document.getElementById("question");
+        const statementsDiv = document.getElementById("statements");
+        const optionsDiv = document.getElementById("options");
+
+        if (statementsDiv) statementsDiv.innerHTML = "";
+        if (optionsDiv) optionsDiv.innerHTML = "";
+
+        const errorHTML = `
+            <div class="error-container">
+                <div class="error-icon">🚧</div>
+                <div class="error-title">問題データ作成中</div>
+                <div class="error-message">
+                    申し訳ございません。<br>
+                    選択された問題集は現在作成中です。
+                </div>
+                <div class="error-details">
+                    <strong>選択された問題集:</strong> ${title}<br>
+                    <strong>ファイル名:</strong> ${filename}<br>
+                    <strong>現在のURL:</strong> ${window.location.href}<br>
+                    <strong>試行したパス:</strong> ${window.location.origin}/${filename}<br>
+                    ${errorDetails ? `<strong>エラー詳細:</strong> ${errorDetails}` : ''}
+                </div>
+                <p style="color: #856404; font-size: 14px;">
+                    この問題集は近日中に公開予定です。<br>
+                    しばらくお待ちください。
+                </p>
+                <button class="home-button" onclick="window.location.href='index.html'">
+                    ホームに戻る
+                </button>
+            </div>
+        `;
+
+        if (questionEl) {
+            questionEl.innerHTML = errorHTML;
+        }
+    }
+
+    /* ========================================
+       問題データ読み込み
+    ======================================== */
+    
+    async function loadQuestions() {
+        try {
+            const params = getQueryParams();
+            console.log('[DEBUG] loadQuestions() 開始:', params);
+            
+            quizTitle = params.title;
+            shuffleChoices = params.shuffleChoices;
+            shuffleQuestions = params.shuffleQuestions;
+            
+            const quizTitleEl = document.getElementById("quiz-title");
+            if (quizTitleEl) {
+                quizTitleEl.textContent = quizTitle;
+            }
+
+            showDebugInfo(`タイトル: ${params.title}`);
+            showDebugInfo(`問題順シャッフル: ${shuffleQuestions ? 'ON' : 'OFF'}`);
+            showDebugInfo(`選択肢シャッフル: ${shuffleChoices ? 'ON' : 'OFF'}`);
+
+            let allQuestions = [];
+
+            // 複数ファイルの場合
+            if (params.files) {
+                const fileList = params.files.split(',');
+                showDebugInfo(`複数ファイル読み込み: ${fileList.length}件`);
+                
+                for (const file of fileList) {
+                    showDebugInfo(`読み込み中: ${file}`);
+                    
+                    try {
+                        const response = await fetch(file);
+                        
+                        if (response.status === 404) {
+                            showDebugInfo(`警告: ${file} が見つかりません (404) - スキップします`);
+                            continue;
+                        }
+                        
+                        if (!response.ok) {
+                            showDebugInfo(`警告: ${file} の読み込みに失敗 (Status: ${response.status}) - スキップします`);
+                            continue;
+                        }
+                        
+                        const data = await response.json();
+                        
+                        if (data && Array.isArray(data) && data.length > 0) {
+                            allQuestions = allQuestions.concat(data);
+                            showDebugInfo(`${file}: ${data.length}問追加 ✓`);
+                        } else {
+                            showDebugInfo(`警告: ${file} にデータがありません - スキップします`);
+                        }
+                    } catch (error) {
+                        showDebugInfo(`エラー: ${file} の読み込み中にエラー - ${error.message}`);
+                        continue;
+                    }
+                }
+                
+                if (allQuestions.length === 0) {
+                    showError(
+                        params.files, 
+                        params.title, 
+                        "すべてのファイルの読み込みに失敗しました。"
+                    );
+                    return;
+                }
+                
+                showDebugInfo(`総問題数: ${allQuestions.length}問`);
+            } 
+            // 単一ファイルの場合
+            else if (params.file) {
+                showDebugInfo(`ファイル名: ${params.file}`);
+                showDebugInfo(`読み込み開始...`);
+                
+                const response = await fetch(params.file);
+                showDebugInfo(`レスポンスステータス: ${response.status}`);
+
+                if (response.status === 404) {
+                    showError(params.file, params.title, "HTTP 404 - ファイルが見つかりません");
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: 問題データの読み込みに失敗しました`);
+                }
+
+                allQuestions = await response.json();
+                showDebugInfo(`問題数: ${allQuestions.length}`);
+
+                if (!allQuestions || allQuestions.length === 0) {
+                    showError(params.file, params.title, "データが空です");
+                    return;
+                }
+            } else {
+                showError('', params.title, 'URLパラメータが不正です');
+                return;
+            }
+
+            // シャッフル処理
+            questions = shuffleQuestions ? shuffleArray(allQuestions) : allQuestions;
+            showDebugInfo(`問題の読み込み完了`);
+
+            // デバッグ情報を非表示
+            const debugInfo = document.getElementById("debug-info");
+            if (debugInfo) {
+                debugInfo.style.display = "none";
+            }
+            
+            const progressContainer = document.getElementById("progress-container");
+            if (progressContainer) {
+                progressContainer.style.display = "block";
+            }
+            
+            console.log('[DEBUG] loadQuestion() を呼び出します');
+            loadQuestion();
+            
+        } catch (error) {
+            console.error('[ERROR] loadQuestions() でエラー発生:', error);
+            const params = getQueryParams();
+            showError(
+                params.file || params.files, 
+                params.title, 
+                error.message
+            );
+        }
+    }
+
+    /* ========================================
+       進捗情報更新
+    ======================================== */
+    
+    function updateProgressInfo() {
+        const totalAnswered = correctCount + incorrectCount;
+        const accuracyRate = totalAnswered > 0 
+            ? ((correctCount / totalAnswered) * 100).toFixed(1) 
+            : 0;
+
+        const questionCounterEl = document.getElementById("question-counter");
+        if (questionCounterEl) {
+            questionCounterEl.textContent = `問題 ${currentQuestionIndex + 1} / ${questions.length}`;
+        }
+        
+        const accuracyRateEl = document.getElementById("accuracy-rate");
+        if (accuracyRateEl) {
+            accuracyRateEl.textContent = `正答率: ${accuracyRate}% (${correctCount}/${totalAnswered})`;
+        }
+
+        // 途中結果ボタンの表示制御（新規追加）
+        const showResultBtn = document.getElementById("show-result-btn");
+        if (showResultBtn && totalAnswered > 0) {
+            showResultBtn.style.display = "inline-block";
+        }
+    }
+
+    /* ========================================
+       問題表示
+    ======================================== */
+    
+    function loadQuestion() {
+        console.log('[DEBUG] loadQuestion() 開始');
+        isAnswered = false;
+
+        const question = questions[currentQuestionIndex];
+        console.log('[DEBUG] 現在の問題:', question);
+        
+        const questionEl = document.getElementById("question");
+        if (!questionEl) {
+            console.error('[ERROR] question 要素が見つかりません');
+            return;
+        }
+        questionEl.textContent = question.text;
+
+        const statementsDiv = document.getElementById("statements");
+        if (!statementsDiv) {
+            console.error('[ERROR] statements 要素が見つかりません');
+            return;
+        }
+        statementsDiv.innerHTML = "";
+
+        if (question.statements && Array.isArray(question.statements) && question.statements.length > 0) {
+            question.statements.forEach(statement => {
+                const statementElement = document.createElement("div");
+                statementElement.classList.add("statement");
+                statementElement.textContent = statement;
+                statementsDiv.appendChild(statementElement);
+            });
+        }
+
+        const progressEl = document.getElementById("progress");
+        if (progressEl) {
+            const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+            progressEl.style.width = `${progress}%`;
+        }
+
+        updateProgressInfo();
+
+        const optionsDiv = document.getElementById("options");
+        if (!optionsDiv) {
+            console.error('[ERROR] options 要素が見つかりません');
+            return;
+        }
+        optionsDiv.innerHTML = "";
+
+        const optionsWithIndex = question.options.map((option, index) => ({
+            text: option,
+            originalIndex: index
+        }));
+
+        currentShuffledOptions = shuffleChoices ? shuffleArray(optionsWithIndex) : optionsWithIndex;
+
+        currentShuffledOptions.forEach((option, index) => {
+            const optionElement = document.createElement("div");
+            optionElement.classList.add("option");
+            optionElement.textContent = `${index + 1}. ${option.text}`;
+            optionElement.addEventListener("click", () => checkAnswer(index));
+            optionsDiv.appendChild(optionElement);
+        });
+
+        const resultEl = document.getElementById("result");
+        const explanationEl = document.getElementById("explanation");
+        const nextButton = document.getElementById("next-button");
+
+        if (resultEl) resultEl.innerHTML = "";
+        if (explanationEl) explanationEl.innerHTML = "";
+        if (nextButton) nextButton.style.display = "none";
+        
+        console.log('[DEBUG] loadQuestion() 完了');
+    }
+
+    /* ========================================
+       解答チェック
+    ======================================== */
+    
+    function checkAnswer(selectedIndex) {
+        if (isAnswered) return;
+
+        isAnswered = true;
+
+        const question = questions[currentQuestionIndex];
+        const options = document.querySelectorAll("#options .option");
+
+        const correctShuffledIndex = currentShuffledOptions.findIndex(
+            option => option.originalIndex === question.correct
+        );
+
+        options.forEach((option, index) => {
+            option.classList.add("disabled");
+            option.style.cursor = "not-allowed";
+
+            if (index === correctShuffledIndex) {
+                option.classList.add("correct");
+            } else if (index === selectedIndex) {
+                option.classList.add("incorrect");
+            }
+        });
+
+        const isCorrect = selectedIndex === correctShuffledIndex;
+        const correctOption = currentShuffledOptions[correctShuffledIndex];
+
+        const resultEl = document.getElementById("result");
+        if (resultEl) {
+            resultEl.innerHTML = isCorrect
+                ? `<span style="color: green; font-weight: bold;">正解：${correctShuffledIndex + 1}</span>`
+                : `<span style="color: red; font-weight: bold;">正解：${correctShuffledIndex + 1}</span>`;
+        }
+
+        if (isCorrect) {
+            correctCount++;
+        } else {
+            incorrectCount++;
+            wrongQuestions.push(question);
+        }
+
+        updateProgressInfo();
+
+        const explanationEl = document.getElementById("explanation");
+        if (explanationEl) {
+            explanationEl.innerHTML = `<strong>解説：</strong><br>${reorderExplanation(question.explanation, currentShuffledOptions)}`;
+        }
+        
+        const nextButton = document.getElementById("next-button");
+        if (nextButton) {
+            nextButton.style.display = "block";
+        }
+    }
+
+    /* ========================================
+       次の問題へ移動
+    ======================================== */
+    
+    function goToNextQuestion() {
+        currentQuestionIndex++;
+        
+        if (currentQuestionIndex < questions.length) {
+            loadQuestion();
+        } else {
+            showFinalResult();
+        }
+    }
+
+/* ========================================
+       最終結果表示（改善版：再挑戦ボタン2種類）
+    ======================================== */
+    
+    function showFinalResult() {
+        const navButtons = document.getElementById("navigation-buttons");
+        if (navButtons) {
+            navButtons.style.display = "none";
+        }
+
+        const questionEl = document.getElementById("question");
+        if (questionEl) {
+            questionEl.textContent = "お疲れ様でした！";
+        }
+        
+        const statementsDiv = document.getElementById("statements");
+        const optionsDiv = document.getElementById("options");
+        const resultEl = document.getElementById("result");
+        const explanationEl = document.getElementById("explanation");
+        const nextButton = document.getElementById("next-button");
+
+        if (statementsDiv) statementsDiv.innerHTML = "";
+        if (optionsDiv) optionsDiv.innerHTML = "";
+        if (resultEl) resultEl.textContent = "";
+        if (explanationEl) explanationEl.textContent = "";
+        if (nextButton) nextButton.style.display = "none";
+
+        const totalAnswered = correctCount + incorrectCount;
+        const accuracyRate = totalAnswered > 0
+            ? ((correctCount / totalAnswered) * 100).toFixed(1)
+            : 0;
+
+        const isPass = parseFloat(accuracyRate) >= 60;
+        const passFailText = isPass ? '合格' : '不合格';
+        const passFailClass = isPass ? 'pass' : 'fail';
+        const passFailMessage = isPass 
+            ? '合格基準（60%）を達成しました！おめでとうございます！' 
+            : '合格基準（60%）に達していません。もう一度挑戦しましょう。';
+
+        const resultSummary = document.getElementById("result-summary");
+        if (resultSummary) {
+            resultSummary.innerHTML = `
+                <h2>最終結果</h2>
+                ${createPieChart(correctCount, incorrectCount, accuracyRate)}
+                <div style="text-align: center; margin: 20px 0;">
+                    <p style="font-size: 18px;"><strong>正解数:</strong> ${correctCount} 問</p>
+                    <p style="font-size: 18px;"><strong>不正解数:</strong> ${incorrectCount} 問</p>
+                    <p style="font-size: 18px;"><strong>正答率:</strong> ${accuracyRate}%</p>
+                    <div class="pass-fail-badge ${passFailClass}">
+                        ${passFailText}
+                    </div>
+                    <p style="font-size: 16px; color: #666; margin-top: 10px;">
+                        ${passFailMessage}
+                    </p>
+                </div>
+                <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content: center;">
+                    <button id="retry-wrong-btn" class="retry-button wrong"${wrongQuestions.length === 0 ? ' disabled' : ''}>
+                        📝 間違えた問題のみ再挑戦（${wrongQuestions.length}問）
+                    </button>
+                    <button id="retry-all-btn" class="retry-button all">
+                        🔄 最初から全問再挑戦
+                    </button>
+                    <button class="go-home-btn">🏠 ホームに戻る</button>
+                </div>
+            `;
+            resultSummary.style.display = "block";
+            resultSummary.classList.add("active");
+
+            // ホームに戻るボタン
+            document.querySelectorAll(".go-home-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    window.location.href = 'index.html';
+                });
+            });
+
+            // 間違えた問題のみ再挑戦
+            const retryWrongBtn = document.getElementById("retry-wrong-btn");
+            if (retryWrongBtn) {
+                retryWrongBtn.addEventListener("click", () => {
+                    if (wrongQuestions.length === 0) return;
+                    startRetrySession('wrong');
+                });
+            }
+
+            // 最初から全問再挑戦
+            const retryAllBtn = document.getElementById("retry-all-btn");
+            if (retryAllBtn) {
+                retryAllBtn.addEventListener("click", () => {
+                    startRetrySession('all');
+                });
+            }
+        }
+    }
+
+    /* ========================================
+       再挑戦セッション開始（統合版）
+    ======================================== */
+    
+    function startRetrySession(mode) {
+        // 全問題を保存（初回のみ）
+        if (!window.originalQuestions) {
+            window.originalQuestions = [...questions];
+        }
+
+        // モードに応じて問題を設定
+        if (mode === 'wrong') {
+            // 間違えた問題のみ
+            if (wrongQuestions.length === 0) {
+                alert('間違えた問題がありません。');
+                return;
+            }
+            questions = shuffleQuestions ? shuffleArray([...wrongQuestions]) : [...wrongQuestions];
+        } else if (mode === 'all') {
+            // 最初から全問
+            questions = shuffleQuestions ? shuffleArray([...window.originalQuestions]) : [...window.originalQuestions];
+        }
+
+        // 状態をリセット
+        currentQuestionIndex = 0;
+        correctCount = 0;
+        incorrectCount = 0;
+        isAnswered = false;
+        wrongQuestions = [];
+
+        // UIをリセット
+        const navButtons = document.getElementById("navigation-buttons");
+        if (navButtons) {
+            navButtons.style.display = "flex";
+        }
+
+        const showResultBtn = document.getElementById("show-result-btn");
+        if (showResultBtn) {
+            showResultBtn.style.display = "none";
+        }
+
+        const resultSummary = document.getElementById("result-summary");
+        if (resultSummary) {
+            resultSummary.style.display = "none";
+            resultSummary.classList.remove("active");
+        }
+        
+        const progressEl = document.getElementById("progress");
+        if (progressEl) {
+            progressEl.style.width = "0%";
+        }
+        
+        const progressContainer = document.getElementById("progress-container");
+        if (progressContainer) {
+            progressContainer.style.display = "block";
+        }
+        
+        const questionEl = document.getElementById("question");
+        const statementsDiv = document.getElementById("statements");
+        const optionsDiv = document.getElementById("options");
+        const resultEl = document.getElementById("result");
+        const explanationEl = document.getElementById("explanation");
+
+        if (questionEl) questionEl.textContent = "";
+        if (statementsDiv) statementsDiv.innerHTML = "";
+        if (optionsDiv) optionsDiv.innerHTML = "";
+        if (resultEl) resultEl.textContent = "";
+        if (explanationEl) explanationEl.textContent = "";
+
+        // 問題を読み込み
+        loadQuestion();
+    }
+
+    /* ========================================
+       イベントリスナー登録 & 初期化
+    ======================================== */
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('[DEBUG] DOMContentLoaded イベント発火');
+        
+        const params = getQueryParams();
+        console.log('[DEBUG] パラメータ:', params);
+        
+        // 途中結果ボタンのイベント設定（新規追加）
+        const showResultBtn = document.getElementById("show-result-btn");
+        if (showResultBtn) {
+            showResultBtn.addEventListener("click", showInterimResult);
+        }
+
+        // モーダル外クリックで閉じる
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('interim-result-modal');
+            if (event.target === modal) {
+                closeInterimResult();
+            }
+        });
+        
+        if (params.file || params.files) {
+            console.log('[DEBUG] loadQuestions() を呼び出します');
+            loadQuestions();
+        } else {
+            console.log('[DEBUG] パラメータなし - エラー表示');
+            showError('', 'パラメータエラー', 'URLパラメータが指定されていません');
+        }
+    });
+</script>
+</body>
+</html>
