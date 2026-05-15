@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>補償業務管理士試験 - 問題選択</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 100%;
+            padding: 40px;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #444;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #667eea;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title .icon {
+            font-size: 20px;
+        }
+
+        /* 科目選択（アイコン + テキストのみ） */
+        .subject-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 12px;
+        }
+
+        .subject-item {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .subject-item:hover {
+            background: #e3f2fd;
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .subject-item .subject-icon {
+            font-size: 28px;
+            margin-right: 12px;
+        }
+
+        .subject-item .subject-label {
+            font-size: 16px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .subject-item.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: #667eea;
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .subject-item.selected .subject-label {
+            color: white;
+            font-weight: bold;
+        }
+
+        /* 年度選択（チェックボックス） */
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .checkbox-item:hover {
+            background: #e3f2fd;
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .checkbox-item label {
+            cursor: pointer;
+            font-size: 15px;
+            color: #333;
+            flex: 1;
+        }
+
+        .checkbox-item.checked {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: #667eea;
+            color: white;
+        }
+
+        .checkbox-item.checked label {
+            color: white;
+            font-weight: bold;
+        }
+
+        /* 設定 */
+        .settings-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .setting-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 18px;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .setting-item:hover {
+            background: #e3f2fd;
+            border-color: #667eea;
+        }
+
+        .setting-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .setting-item label {
+            cursor: pointer;
+            font-size: 15px;
+            color: #333;
+            flex: 1;
+        }
+
+        .setting-item .description {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 16px 32px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .selection-summary {
+            background: #f0f4ff;
+            padding: 16px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .selection-summary h3 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .selection-summary p {
+            font-size: 14px;
+            color: #666;
+            margin: 5px 0;
+        }
+
+        .selection-summary .highlight {
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+            border-left: 4px solid #c62828;
+            font-size: 14px;
+        }
+
+        /* レスポンシブ対応 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .subject-grid,
+            .checkbox-group {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 15px;
+                border-radius: 15px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .section-title {
+                font-size: 16px;
+            }
+
+            .subject-item,
+            .checkbox-item,
+            .setting-item {
+                padding: 10px 12px;
+            }
+
+            .btn {
+                padding: 14px 24px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1> 補償業務管理士試験</h1>
+        <p class="subtitle">学習したい科目と年度を選択してください</p>
+
+        <!-- 科目選択（単一選択・ラジオボタンなし） -->
+        <div class="section">
+            <div class="section-title">
+                <span class="icon">📖</span>
+                <span>科目選択</span>
+            </div>
+            <div class="subject-grid" id="subject-group">
+                <!-- 共通科目 -->
+                <div class="subject-item" data-value="common">
+                    <span class="subject-icon">📚</span>
+                    <span class="subject-label">共通科目</span>
+                </div>
+                
+                <!-- 土地調査 -->
+                <div class="subject-item" data-value="land_survey">
+                    <span class="subject-icon">📐</span>
+                    <span class="subject-label">土地調査</span>
+                </div>
+                
+                <!-- 土地評価 -->
+                <div class="subject-item" data-value="land_value">
+                    <span class="subject-icon">🗺️</span>
+                    <span class="subject-label">土地評価</span>
+                </div>
+                
+                <!-- 物件 -->
+                <div class="subject-item" data-value="property">
+                    <span class="subject-icon">🏠</span>
+                    <span class="subject-label">物件</span>
+                </div>
+                
+                <!-- 機械工作物 -->
+                <div class="subject-item" data-value="machinery">
+                    <span class="subject-icon">🔩</span>
+                    <span class="subject-label">機械工作物</span>
+                </div>
+                
+                <!-- 営業・特殊補償 -->
+                <div class="subject-item" data-value="business">
+                    <span class="subject-icon">💼</span>
+                    <span class="subject-label">営業・特殊補償</span>
+                </div>
+                
+                <!-- 事業損失 -->
+                <div class="subject-item" data-value="loss">
+                    <span class="subject-icon">📉</span>
+                    <span class="subject-label">事業損失</span>
+                </div>
+                
+                <!-- 補償関連 -->
+                <div class="subject-item" data-value="related">
+                    <span class="subject-icon">🔗</span>
+                    <span class="subject-label">補償関連</span>
+                </div>
+                
+                <!-- 総合補償 -->
+                <div class="subject-item" data-value="comprehensive">
+                    <span class="subject-icon">🏆</span>
+                    <span class="subject-label">総合補償</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 年度選択（複数選択可） -->
+        <div class="section">
+            <div class="section-title">
+                <span class="icon">📅</span>
+                <span>年度選択</span>
+            </div>
+            <div class="checkbox-group" id="year-group">
+                <div class="checkbox-item" data-value="r7">
+                    <input type="checkbox" id="year-r7" value="r7">
+                    <label for="year-r7">令和7年度 (2025)</label>
+                </div>
+                <div class="checkbox-item" data-value="r6">
+                    <input type="checkbox" id="year-r6" value="r6">
+                    <label for="year-r6">令和6年度 (2024)</label>
+                </div>
+                <div class="checkbox-item" data-value="r5">
+                    <input type="checkbox" id="year-r5" value="r5">
+                    <label for="year-r5">令和5年度 (2023)</label>
+                </div>
+                <div class="checkbox-item" data-value="r4">
+                    <input type="checkbox" id="year-r4" value="r4">
+                    <label for="year-r4">令和4年度 (2022)</label>
+                </div>
+                <div class="checkbox-item" data-value="r3">
+                    <input type="checkbox" id="year-r3" value="r3">
+                    <label for="year-r3">令和3年度 (2021)</label>
+                </div>
+                <div class="checkbox-item" data-value="r1">
+                    <input type="checkbox" id="year-r1" value="r1">
+                    <label for="year-r1">令和元年度 (2019)</label>
+                </div>
+                <div class="checkbox-item" data-value="h30">
+                    <input type="checkbox" id="year-h30" value="h30">
+                    <label for="year-h30">平成30年度 (2018)</label>
+                </div>
+                <div class="checkbox-item" data-value="h29">
+                    <input type="checkbox" id="year-h29" value="h29">
+                    <label for="year-h29">平成29年度 (2017)</label>
+                </div>
+                <div class="checkbox-item" data-value="h28">
+                    <input type="checkbox" id="year-h28" value="h28">
+                    <label for="year-h28">平成28年度 (2016)</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- 設定 -->
+        <div class="section">
+            <div class="section-title">
+                <span class="icon">⚙️</span>
+                <span>出題設定</span>
+            </div>
+            <div class="settings-group">
+                <div class="setting-item">
+                    <input type="checkbox" id="shuffle-questions">
+                    <label for="shuffle-questions">
+                        <div>問題をシャッフルする</div>
+                        <div class="description">問題の出題順序をランダムにします</div>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <input type="checkbox" id="shuffle-choices">
+                    <label for="shuffle-choices">
+                        <div>選択肢をシャッフルする</div>
+                        <div class="description">各問題の選択肢の順序をランダムにします</div>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- 選択サマリー -->
+        <div class="selection-summary" id="selection-summary">
+            <h3> 現在の選択</h3>
+            <p>科目: <span class="highlight" id="summary-subject">未選択</span></p>
+            <p>年度: <span class="highlight" id="summary-years">未選択</span></p>
+        </div>
+
+        <!-- エラーメッセージ -->
+        <div class="error-message" id="error-message"></div>
+
+        <!-- ボタン -->
+        <div class="button-group">
+            <button class="btn btn-secondary" onclick="resetSelections()">
+                 選択をリセット
+            </button>
+            <button class="btn btn-primary" id="start-button" onclick="startQuiz()" disabled>
+                 問題を開始する
+            </button>
+        </div>
+    </div>
+
+<script>
+    // 科目名マッピング
+    const subjectNames = {
+        'common': '共通科目',
+        'land_survey': '土地調査',
+        'land_value': '土地評価',
+        'property': '物件',
+        'machinery': '機械工作物',
+        'business': '営業・特殊補償',
+        'loss': '事業損失',
+        'related': '補償関連',
+        'comprehensive': '総合補償'
+    };
+
+    // 年度名マッピング
+    const yearNames = {
+        'r7': '令和7年度',
+        'r6': '令和6年度',
+        'r5': '令和5年度',
+        'r4': '令和4年度',
+        'r3': '令和3年度',
+        'r1': '令和元年度',
+        'h30': '平成30年度',
+        'h29': '平成29年度',
+        'h28': '平成28年度'
+    };
+
+    // 選択中の科目を保持
+    let selectedSubject = null;
+
+    // 科目選択（クリックで選択/解除）
+    document.querySelectorAll('.subject-item').forEach(item => {
+        item.addEventListener('click', function() {
+            const value = this.getAttribute('data-value');
+            
+            // 既に選択されている場合は解除
+            if (selectedSubject === value) {
+                selectedSubject = null;
+                this.classList.remove('selected');
+            } else {
+                // 他の選択を解除
+                document.querySelectorAll('.subject-item').forEach(i => {
+                    i.classList.remove('selected');
+                });
+                // 新しく選択
+                selectedSubject = value;
+                this.classList.add('selected');
+            }
+            
+            updateSummary();
+        });
+    });
+
+    // チェックボックス（年度）のUI更新
+    document.querySelectorAll('.checkbox-item').forEach(item => {
+        const checkbox = item.querySelector('input[type="checkbox"]');
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                item.classList.add('checked');
+            } else {
+                item.classList.remove('checked');
+            }
+            updateSummary();
+        });
+
+        item.addEventListener('click', function(e) {
+            if (e.target !== checkbox) {
+                checkbox.checked = !checkbox.checked;
+                checkbox.dispatchEvent(new Event('change'));
+            }
+        });
+    });
+
+    // LocalStorageから前回の設定を復元
+    window.addEventListener('load', function() {
+        const shuffleQuestions = localStorage.getItem('shuffleQuestions') === 'true';
+        const shuffleChoices = localStorage.getItem('shuffleChoices') === 'true';
+        
+        document.getElementById('shuffle-questions').checked = shuffleQuestions;
+        document.getElementById('shuffle-choices').checked = shuffleChoices;
+    });
+
+    // サマリー更新
+    function updateSummary() {
+        const selectedYears = Array.from(document.querySelectorAll('#year-group input:checked'))
+            .map(cb => cb.value);
+
+        const subjectText = selectedSubject
+            ? subjectNames[selectedSubject]
+            : '未選択';
+        const yearText = selectedYears.length > 0
+            ? selectedYears.map(y => yearNames[y]).join(', ')
+            : '未選択';
+
+        document.getElementById('summary-subject').textContent = subjectText;
+        document.getElementById('summary-years').textContent = yearText;
+
+        // ボタンの有効/無効
+        const startButton = document.getElementById('start-button');
+        if (selectedSubject && selectedYears.length > 0) {
+            startButton.disabled = false;
+        } else {
+            startButton.disabled = true;
+        }
+
+        // エラーメッセージを非表示
+        document.getElementById('error-message').style.display = 'none';
+    }
+
+    // 選択をリセット
+    function resetSelections() {
+        // 科目選択を解除
+        selectedSubject = null;
+        document.querySelectorAll('.subject-item').forEach(item => {
+            item.classList.remove('selected');
+        });
+        
+        // 年度選択を解除
+        document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+            cb.checked = false;
+        });
+        document.querySelectorAll('.checkbox-item').forEach(item => {
+            item.classList.remove('checked');
+        });
+        
+        updateSummary();
+    }
+
+    // クイズを開始（★★★ 修正完了版 ★★★）
+    function startQuiz() {
+        const selectedYears = Array.from(document.querySelectorAll('#year-group input:checked'))
+            .map(cb => cb.value);
+
+        if (!selectedSubject || selectedYears.length === 0) {
+            const errorMsg = document.getElementById('error-message');
+            errorMsg.textContent = '⚠️ 科目と年度を選択してください';
+            errorMsg.style.display = 'block';
+            return;
+        }
+
+        // LocalStorageに設定を保存
+        const shuffleQuestions = document.getElementById('shuffle-questions').checked;
+        const shuffleChoices = document.getElementById('shuffle-choices').checked;
+        localStorage.setItem('shuffleQuestions', shuffleQuestions);
+        localStorage.setItem('shuffleChoices', shuffleChoices);
+
+        // 年度を古い順にソート
+        selectedYears.sort();
+
+        // デバッグ情報をコンソールに出力
+        console.log('[DEBUG] 選択された科目:', selectedSubject);
+        console.log('[DEBUG] 選択された年度:', selectedYears);
+
+        // ★単一ファイルの場合★
+        if (selectedYears.length === 1) {
+            const year = selectedYears[0];
+            const filename = `data/${selectedSubject}_${year}.json`;  // ✅ data/ 追加
+            const title = `${subjectNames[selectedSubject]}（${yearNames[year]}）`;
+            
+            console.log('[DEBUG] 単一ファイルURL:', filename);
+            
+            const url = `quiz.html?file=${encodeURIComponent(filename)}&title=${encodeURIComponent(title)}&shuffleQuestions=${shuffleQuestions}&shuffleChoices=${shuffleChoices}`;
+            console.log('[DEBUG] 遷移先URL:', url);
+            
+            window.location.href = url;
+        } 
+        // ★複数ファイルの場合★
+        else {
+            const files = selectedYears.map(year => `data/${selectedSubject}_${year}.json`).join(',');  // ✅ data/ 追加
+            const yearLabels = selectedYears.map(year => yearNames[year]).join('・');
+            const title = `${subjectNames[selectedSubject]}（${yearLabels}）`;
+            
+            console.log('[DEBUG] 複数ファイルURL:', files);
+            
+            const url = `quiz.html?files=${encodeURIComponent(files)}&title=${encodeURIComponent(title)}&shuffleQuestions=${shuffleQuestions}&shuffleChoices=${shuffleChoices}`;
+            console.log('[DEBUG] 遷移先URL:', url);
+            
+            window.location.href = url;
+        }
+    }
+
+    // 初期化
+    updateSummary();
+</script>
+</body>
+</html>
